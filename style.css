@@ -29,14 +29,18 @@
   --error-border: #00326b;
 }
 
-body {
-  background-color: var(--bg-color); /* Very light slate background */
-  color: var(--text-color);
-  height: 100vh;
-  width: 100vw;
+html, body {
+  height: 100%;
+  margin: 0;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  width: 100vw;
+  height: 100vh;
 }
 
 /* Fullscreen Canvas */
@@ -51,11 +55,10 @@ body {
 /* Minimalist Clean Header */
 .chat-header {
   background-color: #4f46e5;
-  /* Deep indigo accent */
   color: #ffffff;
   padding: 16px 24px;
   text-align: center;
-  position: relative; /* Keep the title centered while positioning the theme toggle independently */
+  position: relative;
 }
 
 /* Position the theme toggle at the right side of the header */
@@ -64,7 +67,6 @@ body {
   right: 24px;
   top: 50%;
   transform: translateY(-50%);
-
   padding: 8px 14px;
   background: transparent;
   color: #ffffff;
@@ -83,11 +85,11 @@ body {
   color: #ffffff;
 }
 
-/* Full-width container with comfortable margins */
-.chat-window {
+/* Chat container expands to fill remaining space */
+.chat-window,
+#chat-window {
   flex: 1;
   padding: 30px 15%;
-  /* Generous side padding for desktop */
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -96,28 +98,31 @@ body {
 
 /* Message base styling */
 .message {
-  max-width: 75%;
+  display: flex;
+  flex-direction: column;
+  max-width: 65%;
+  width: fit-content;
   padding: 14px 18px;
   border-radius: 12px;
   font-size: 15px;
   line-height: 1.6;
   word-wrap: break-word;
+  position: relative;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-/* User Message: Aligned Right with modern Indigo accent */
+/* User Message: Aligned Right */
 .message.user {
   align-self: flex-end;
   background-color: #4f46e5;
-  /* Deep indigo */
   color: #ffffff;
   border-bottom-right-radius: 2px;
 }
 
-/* AI Message: Aligned Left with crisp off-white/light-gray tone */
+/* AI Message: Aligned Left */
 .message.ai {
   align-self: flex-start;
-  background-color: var(--secondary-bg); /* Slate tint */
+  background-color: var(--secondary-bg);
   color: var(--text-color);
   border: 1px solid var(--border-color);
   border-bottom-left-radius: 2px;
@@ -130,6 +135,8 @@ body {
   color: var(--error-text);
   font-size: 14px;
   border: 1px solid var(--error-border);
+  max-width: 80%;
+  text-align: center;
 }
 
 /* Input Bar Container */
@@ -139,6 +146,7 @@ body {
   border-top: 1px solid var(--border-color);
   display: flex;
   gap: 12px;
+  margin-top: auto;
 }
 
 #user-input {
@@ -184,26 +192,13 @@ body {
   cursor: not-allowed;
 }
 
-/* Responsive adjustment for small screens */
-@media (max-width: 768px) {
-
-  .chat-window,
-  .input-container {
-    padding-left: 16px;
-    padding-right: 16px;
-  }
-
-  .message {
-    max-width: 88%;
-    /* Give messages slightly more room on mobile */
-  }
-}
-
-
-
-/*added*/
-/* Typing indicator */
-.typing-indicator {
+/* Typing indicator - strictly horizontal */
+.message.typing-indicator {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 4px;
+  width: fit-content;
   align-self: flex-start;
   background: var(--secondary-bg);
   color: var(--text-color);
@@ -211,46 +206,39 @@ body {
   border-radius: 12px;
 }
 
-.typing-indicator span {
+.message.typing-indicator span {
   display: inline-block;
   margin: 0 2px;
+  line-height: 1;
   animation: blink 1.2s infinite;
 }
 
-.typing-indicator span:nth-child(2) {
+.message.typing-indicator span:nth-child(2) {
   animation-delay: 0.2s;
 }
 
-.typing-indicator span:nth-child(3) {
+.message.typing-indicator span:nth-child(3) {
   animation-delay: 0.4s;
 }
 
 @keyframes blink {
-
   0%,
   100% {
     opacity: 0.3;
   }
-
   50% {
     opacity: 1;
   }
 }
 
 /* --- Message Timestamp Styles (#4) --- */
-.message {
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  word-break: break-word;
-}
-
 .message-time {
   font-size: 0.72rem;
   margin-top: 0.35rem;
   align-self: flex-end;
-  opacity: 0.75;
+  opacity: 0.85;
   user-select: none;
+  font-variant-numeric: tabular-nums;
 }
 
 /* User Bubble Time Color */
@@ -263,84 +251,14 @@ body {
   color: #64748b;
 }
 
-/* Dark Mode Overrides */
-body.dark .message.ai .message-time {
-  color: #94a3b8;
-}
-
 /* Error Bubble Time Color */
-.message.error .message-time {
-  color: #fca5a5;
-}
-
-/* --- Message Layout & Bubble Sizing (#4) --- */
-#chat-window {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  padding: 1rem;
-}
-
-/* Give messages bubble constraints so they don't stretch full width */
-.message {
-  display: flex;
-  flex-direction: column;
-  max-width: 65%;
-  width: fit-content;
-  padding: 0.65rem 1rem;
-  border-radius: 14px;
-  line-height: 1.45;
-  word-break: break-word;
-}
-
-/* Align User to the right */
-.message.user {
-  align-self: flex-end;
-  border-bottom-right-radius: 4px;
-}
-
-/* Align AI to the left */
-.message.ai {
-  align-self: flex-start;
-  border-bottom-left-radius: 4px;
-}
-
-/* Align Error to center or left */
-.message.error {
-  align-self: center;
-  max-width: 80%;
-  text-align: center;
-}
-
-/* --- Timestamp Typography & Positioning --- */
-.message-time {
-  font-size: 0.7rem;
-  margin-top: 0.35rem;
-  align-self: flex-end;
-  user-select: none;
-  font-variant-numeric: tabular-nums;
-}
-
-/* User Bubble Time */
-.message.user .message-time {
-  color: #e0e7ff;
-  opacity: 0.85;
-}
-
-/* AI Bubble Time */
-.message.ai .message-time {
-  color: #64748b;
-  opacity: 0.85;
-}
-
-/* Error Bubble Time */
 .message.error .message-time {
   color: #991b1b;
   font-weight: 600;
-  align-self: center; /* center time for error banner */
+  align-self: center;
 }
 
-/* --- Dark Mode Tweaks --- */
+/* Dark Mode Overrides */
 body.dark .message.ai .message-time {
   color: #94a3b8;
 }
@@ -349,30 +267,16 @@ body.dark .message.error .message-time {
   color: #fca5a5;
 }
 
-/* Ensure the full screen height is utilized */
-html, body {
-  height: 100%;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-}
+/* Responsive adjustment for small screens */
+@media (max-width: 768px) {
+  .chat-window,
+  #chat-window,
+  .input-container {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
 
-/* Chat container expands to fill remaining space */
-#chat-window {
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  padding: 1.5rem;
+  .message {
+    max-width: 88%;
+  }
 }
-
-/* Pin the input bar area to the bottom */
-.input-container, 
-.input-area,
-footer {
-  margin-top: auto;
-  padding: 1rem 1.5rem 1.5rem 1.5rem;
-  background: inherit;
-}
-
