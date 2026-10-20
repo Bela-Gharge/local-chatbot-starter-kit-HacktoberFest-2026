@@ -5,7 +5,7 @@ const themeToggle = document.getElementById('theme-toggle');
 
 // Toggle the dark theme when the user clicks the theme button
 themeToggle.addEventListener('click', () => {
-    document.body.classList.toggle("dark");
+  document.body.classList.toggle("dark");
 });
 
 sendBtn.addEventListener('click', sendMessage);
@@ -16,6 +16,7 @@ userInput.addEventListener('keydown', (event) => {
   }
 });
 
+<<<<<<< HEAD
 // Automatically resize textarea as the user types
 userInput.addEventListener('input', () => {
   userInput.style.height = 'auto';
@@ -26,6 +27,16 @@ userInput.addEventListener('input', () => {
   userInput.style.overflowY =
     userInput.scrollHeight > maxHeight ? 'auto' : 'hidden';
 });
+=======
+// Helper: Format timestamp as "hh:mm AM/PM"
+function formatTimestamp() {
+  const now = new Date();
+  return now.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+>>>>>>> upstream/main
 
 async function sendMessage() {
   const text = userInput.value.trim();
@@ -75,9 +86,20 @@ async function sendMessage() {
 function appendMessage(text, senderClass) {
   const messageElement = document.createElement('div');
   messageElement.classList.add('message', senderClass);
-  messageElement.textContent = text;
   messageElement.style.whiteSpace = 'pre-wrap';
 
+  // Message text container
+  const textElement = document.createElement('span');
+  textElement.classList.add('message-text');
+  textElement.textContent = text;
+
+  // Timestamp container
+  const timeElement = document.createElement('span');
+  timeElement.classList.add('message-time');
+  timeElement.textContent = formatTimestamp();
+
+  messageElement.appendChild(textElement);
+  messageElement.appendChild(timeElement);
   chatWindow.appendChild(messageElement);
 
   // Auto-scroll to the bottom
@@ -89,7 +111,6 @@ function toggleInputState(isDisabled) {
   sendBtn.disabled = isDisabled;
 }
 
-/*added function*/
 function showTypingIndicator() {
   const indicator = document.createElement('div');
   indicator.className = 'message typing-indicator';
