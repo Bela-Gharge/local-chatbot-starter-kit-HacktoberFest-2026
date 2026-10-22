@@ -16,7 +16,6 @@ userInput.addEventListener('keydown', (event) => {
   }
 });
 
-<<<<<<< HEAD
 // Automatically resize textarea as the user types
 userInput.addEventListener('input', () => {
   userInput.style.height = 'auto';
@@ -27,7 +26,7 @@ userInput.addEventListener('input', () => {
   userInput.style.overflowY =
     userInput.scrollHeight > maxHeight ? 'auto' : 'hidden';
 });
-=======
+
 // Helper: Format timestamp as "hh:mm AM/PM"
 function formatTimestamp() {
   const now = new Date();
@@ -36,7 +35,6 @@ function formatTimestamp() {
     minute: '2-digit',
   });
 }
->>>>>>> upstream/main
 
 async function sendMessage() {
   const text = userInput.value.trim();
