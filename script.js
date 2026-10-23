@@ -29,10 +29,22 @@ themeToggle.addEventListener('click', () => {
 });
 
 sendBtn.addEventListener('click', sendMessage);
-userInput.addEventListener('keypress', (event) => {
-  if (event.key === 'Enter') {
+userInput.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
     sendMessage();
   }
+});
+
+// Automatically resize textarea as the user types
+userInput.addEventListener('input', () => {
+  userInput.style.height = 'auto';
+
+  const maxHeight = 150;
+  userInput.style.height = Math.min(userInput.scrollHeight, maxHeight) + 'px';
+
+  userInput.style.overflowY =
+    userInput.scrollHeight > maxHeight ? 'auto' : 'hidden';
 });
 
 // Helper: Format timestamp as "hh:mm AM/PM"
@@ -51,6 +63,9 @@ async function sendMessage() {
   // 1. Render User Message & clear input
   appendMessage(text, 'user');
   userInput.value = '';
+
+  userInput.style.height = 'auto';
+  userInput.style.overflowY = 'hidden';
 
   // 2. Disable controls while waiting for backend
   toggleInputState(true);
@@ -89,6 +104,7 @@ async function sendMessage() {
 function appendMessage(text, senderClass) {
   const messageElement = document.createElement('div');
   messageElement.classList.add('message', senderClass);
+  messageElement.style.whiteSpace = 'pre-wrap';
 
   // Message text container
   const textElement = document.createElement('span');
