@@ -17,6 +17,11 @@ public class ChatServer {
 
     static ObjectMapper mapper = new ObjectMapper();
 
+    private static final String SYSTEM_PROMPT =
+        "You are a friendly and helpful AI assistant. " +
+        "Provide clear, accurate, and concise answers. " +
+        "Maintain a polite and respectful tone.";
+
     public static void main(String[] args) throws Exception {
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
 
@@ -27,34 +32,35 @@ public class ChatServer {
                 exchange.getResponseHeaders().set("Access-Control-Allow-Methods", "POST, OPTIONS");
                 exchange.getResponseHeaders().set("Access-Control-Allow-Headers", "Content-Type");
 
-                // The browser sends this BEFORE the real POST, just to check permissions
+                // Handle the browser's CORS preflight request
                 if (exchange.getRequestMethod().equalsIgnoreCase("OPTIONS")) {
                     exchange.sendResponseHeaders(204, -1);
                     return;
                 }
 
-                // Read the user's message
+                // Read the incoming request body
                 InputStream is = exchange.getRequestBody();
                 ByteArrayOutputStream buffer = new ByteArrayOutputStream();
                 is.transferTo(buffer);
                 String rawBody = buffer.toString();
 
-                // Parse the incoming JSON and extract the message/prompt safely
+                // Parse the JSON and extract the user's message
                 JsonNode requestNode = mapper.readTree(rawBody);
-                String userMessage = requestNode.has("message") 
-                    ? requestNode.get("message").asText() 
-                    : requestNode.get("prompt").asText();
+                String userMessage = requestNode.path("message").asText();
 
                 System.out.println("Received message: " + userMessage);
 
-                // Build the request body using Jackson with the correct "llama3" model name
+                // Build the request body for Ollama
                 Map<String, Object> ollamaRequestMap = new HashMap<>();
-                ollamaRequestMap.put("model", "llama3");
+                ollamaRequestMap.put("model", "llama3.2:1b");
+                ollamaRequestMap.put("system", SYSTEM_PROMPT);
                 ollamaRequestMap.put("prompt", userMessage);
                 ollamaRequestMap.put("stream", false);
-                String ollamaRequestBody = mapper.writeValueAsString(ollamaRequestMap);
 
-                // Send it to Ollama
+                String ollamaRequestBody =
+                    mapper.writeValueAsString(ollamaRequestMap);
+
+                // Send the request to Ollama
                 HttpClient client = HttpClient.newHttpClient();
                 HttpRequest ollamaRequest = HttpRequest.newBuilder()
                     .uri(URI.create("http://localhost:11434/api/generate"))
@@ -62,7 +68,10 @@ public class ChatServer {
                     .POST(HttpRequest.BodyPublishers.ofString(ollamaRequestBody))
                     .build();
 
-                HttpResponse<String> ollamaResponse = client.send(ollamaRequest, HttpResponse.BodyHandlers.ofString());
+                HttpResponse<String> ollamaResponse = client.send(
+                    ollamaRequest,
+                    HttpResponse.BodyHandlers.ofString()
+                );
 
                 // Parse Ollama's response
                 JsonNode rootNode = mapper.readTree(ollamaResponse.body());
@@ -77,6 +86,7 @@ public class ChatServer {
 
                 exchange.getResponseHeaders().set("Content-Type", "application/json");
                 exchange.sendResponseHeaders(200, responseJson.getBytes().length);
+
                 OutputStream os = exchange.getResponseBody();
                 os.write(responseJson.getBytes());
                 os.close();
