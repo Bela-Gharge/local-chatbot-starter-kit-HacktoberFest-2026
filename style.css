@@ -29,7 +29,8 @@
   --error-border: #00326b;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
   display: flex;
@@ -110,9 +111,12 @@ body {
 /* Chat container expands to fill remaining space */
 .chat-window,
 #chat-window {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
   padding: 30px 15%;
   overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -148,6 +152,9 @@ body {
   color: var(--text-color);
   border: 1px solid var(--border-color);
   border-bottom-left-radius: 2px;
+  position: relative;
+  padding-top: 14px;
+  padding-right: 38px;
 }
 
 /* Error message state */
@@ -173,6 +180,9 @@ body {
 
 #user-input {
   flex: 1;
+  min-width: 0;
+  min-height: 48px;
+  max-height: 150px;
   padding: 14px 18px;
   background-color: var(--secondary-bg);
   color: var(--text-color);
@@ -180,6 +190,10 @@ body {
   border-radius: 8px;
   outline: none;
   font-size: 15px;
+  font-family: inherit;
+  line-height: 1.5;
+  resize: none;
+  overflow-y: hidden;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -214,6 +228,21 @@ body {
   cursor: not-allowed;
 }
 
+/* Responsive adjustment for small screens */
+@media (max-width: 768px) {
+
+  .chat-window,
+  .input-container {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .message {
+    max-width: 88%;
+    /* Give messages slightly more room on mobile */
+  }
+}
+
 /* Typing indicator - strictly horizontal */
 .message.typing-indicator {
   display: flex !important;
@@ -226,10 +255,19 @@ body {
   color: var(--text-color);
   padding: 10px 14px;
   border-radius: 12px;
+  min-width: 64px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: 1px solid var(--border-color);
 }
 
 .message.typing-indicator span {
   display: inline-block;
+  color: var(--text-color);
+  font-size: 20px;
   margin: 0 2px;
   line-height: 1;
   animation: blink 1.2s infinite;
@@ -244,15 +282,40 @@ body {
 }
 
 @keyframes blink {
+
   0%,
   100% {
     opacity: 0.3;
   }
+
   50% {
     opacity: 1;
   }
 }
 
+.copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  background: transparent;
+  color: var(--text-color);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.copy-btn:hover {
+  background-color: var(--border-color);
+}
+
+.copy-btn:disabled {
+  cursor: default;
+  opacity: 0.7;
+}  
 /* --- Message Timestamp Styles (#4) --- */
 .message-time {
   font-size: 0.72rem;
@@ -291,6 +354,7 @@ body.dark .message.error .message-time {
 
 /* Responsive adjustment for small screens */
 @media (max-width: 768px) {
+
   .chat-window,
   #chat-window,
   .input-container {
@@ -301,4 +365,27 @@ body.dark .message.error .message-time {
   .message {
     max-width: 88%;
   }
+}
+
+/*added lines*/
+/* Scroll to Bottom Button */
+#scroll-bottom-btn {
+  display: none;
+  position: fixed;
+  bottom: 95px;
+  right: 30px;
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 50%;
+  background-color: #4f46e5;
+  color: #ffffff;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
+
+#scroll-bottom-btn:hover {
+  background-color: #4338ca;
 }
