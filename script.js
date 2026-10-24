@@ -104,19 +104,51 @@ async function sendMessage() {
 function appendMessage(text, senderClass) {
   const messageElement = document.createElement('div');
   messageElement.classList.add('message', senderClass);
-  messageElement.style.whiteSpace = 'pre-wrap';
 
-  // Message text container
   const textElement = document.createElement('span');
   textElement.classList.add('message-text');
   textElement.textContent = text;
+
+  messageElement.appendChild(textElement);
+
+  messageElement.style.whiteSpace = 'pre-wrap';
+
+  // Add a copy button only to AI responses
+  if (senderClass === 'ai') {
+    const copyBtn = document.createElement('button');
+    copyBtn.classList.add('copy-btn');
+    copyBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>`;
+    copyBtn.setAttribute('aria-label', 'Copy AI response');
+
+    copyBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(text);
+
+        copyBtn.textContent = '✓';
+        copyBtn.disabled = true;
+
+        setTimeout(() => {
+          copyBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>`;
+          copyBtn.disabled = false;
+        }, 1500);
+      } catch (error) {
+        console.error('Failed to copy response:', error);
+        copyBtn.textContent = 'Copy failed';
+
+        setTimeout(() => {
+          copyBtn.textContent = '📋 Copy';
+        }, 1500);
+      }
+    });
+
+    messageElement.appendChild(copyBtn);
+  }
 
   // Timestamp container
   const timeElement = document.createElement('span');
   timeElement.classList.add('message-time');
   timeElement.textContent = formatTimestamp();
 
-  messageElement.appendChild(textElement);
   messageElement.appendChild(timeElement);
   chatWindow.appendChild(messageElement);
 
